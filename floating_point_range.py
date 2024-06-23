@@ -135,7 +135,7 @@ class frange(Sequence[float]):
     def __ne__(self, other: Any, /) -> bool:
         return not (self == other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((type(self), self.__start, self.__stop, self.__step))
 
     def count(self, value: __SupportsDecimalConversion, /) -> int:
