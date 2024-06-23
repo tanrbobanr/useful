@@ -8,10 +8,17 @@ import sys
 import numbers
 import decimal
 from typing import (
+    Any,
     Tuple,
     Union,
     overload,
 )
+
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
+
 if sys.version_info >= (3, 9):
     from collections.abc import Sequence
 else:
@@ -19,17 +26,25 @@ else:
 
 
 class frange(Sequence[float]):
+    __SupportsDecimalConversion: TypeAlias = Union[
+        decimal.Decimal, numbers.Real, numbers.Integral
+    ]
+
     @overload
     def __init__(
-        self, stop: Union[decimal.Decimal, numbers.Real], /
-    ) -> None: ...
+        self, stop: __SupportsDecimalConversion, /
+    ) -> None:
+        """Return an object that produces a sequence of floats from `start`
+        (inclusive) to `stop` (exclusive) by `step`. range(i, j) produces i, i+1, i+2, ..., j-1. start defaults to 0, and stop is omitted! range(4) produces 0, 1, 2, 3. These are exactly the valid indices for a list of 4 elements. When step is given, it specifies the increment (or decrement)."""
     @overload
     def __init__(
-        self, start: Union[decimal.Decimal, numbers.Real],
-        stop: Union[decimal.Decimal, numbers.Real],
-        step: Union[decimal.Decimal, numbers.Real] = ..., /
+        self, start: __SupportsDecimalConversion,
+        stop: __SupportsDecimalConversion,
+        step: __SupportsDecimalConversion = ..., /
     ) -> None: ...
-    def __init__(self, *args: Union[decimal.Decimal, numbers.Real]) -> None:
+    def __init__(
+        self, *args: __SupportsDecimalConversion
+    ) -> None:
         (
             self.__start, self.__stop, self.__step, self.__len
         ) = self.__parse_args(args)
@@ -37,19 +52,17 @@ class frange(Sequence[float]):
     @property
     def start(self) -> float:
         return float(self.__start)
-    
+
     @property
     def stop(self) -> float:
         return float(self.__stop)
-    
+
     @property
     def step(self) -> float:
         return float(self.__step)
 
     @staticmethod
-    def __to_dec(
-        value: Union[numbers.Real, numbers.Integral, decimal.Decimal]
-    ) -> decimal.Decimal:
+    def __to_dec(value: __SupportsDecimalConversion) -> decimal.Decimal:
         return (
             value if isinstance(value, decimal.Decimal)
             else decimal.Decimal(str(value))
@@ -57,7 +70,7 @@ class frange(Sequence[float]):
 
     @classmethod
     def __parse_args(
-        cls, args: Tuple[Union[decimal.Decimal, numbers.Real], ...]
+        cls, args: Tuple[__SupportsDecimalConversion, ...]
     ) -> Tuple[decimal.Decimal, decimal.Decimal, decimal.Decimal, int]:
         dec_args = tuple(map(cls.__to_dec, args))
         num_args = len(args)
@@ -122,7 +135,8 @@ class frange(Sequence[float]):
     def __hash__(self):
         return hash((type(self), self.__start, self.__stop, self.__step))
 
-    def count(self, value: Union[decimal.Decimal, numbers.Real], /) -> int:
+    def count(self, value: __SupportsDecimalConversion, /) -> int:
+        """Return the number of occurrences of `value`"""
         dec = self.__to_dec(value)
         if dec % self.__step:
             return 0
@@ -132,7 +146,11 @@ class frange(Sequence[float]):
         ))
         return int(low <= dec < high)
 
-    def index(self, value: Union[decimal.Decimal, numbers.Real], /) -> int:
+    def index(self, value: __SupportsDecimalConversion, /) -> int:
+        """Return the index of `value`. Raise ValueError if the value is not
+        present.
+
+        """
         dec = self.__to_dec(value)
         index = (dec - self.__start) / self.__step
         if index % 1 or index >= self.__len:
