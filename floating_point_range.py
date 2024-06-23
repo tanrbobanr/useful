@@ -26,6 +26,11 @@ else:
 
 
 class frange(Sequence[float]):
+    """Works similarly to `range`, but allows for floating point values
+    to be used. See `help(range)` for more information on how to use the
+    object.
+
+    """
     __SupportsDecimalConversion: TypeAlias = Union[
         decimal.Decimal, numbers.Real, numbers.Integral
     ]
@@ -33,9 +38,7 @@ class frange(Sequence[float]):
     @overload
     def __init__(
         self, stop: __SupportsDecimalConversion, /
-    ) -> None:
-        """Return an object that produces a sequence of floats from `start`
-        (inclusive) to `stop` (exclusive) by `step`. range(i, j) produces i, i+1, i+2, ..., j-1. start defaults to 0, and stop is omitted! range(4) produces 0, 1, 2, 3. These are exactly the valid indices for a list of 4 elements. When step is given, it specifies the increment (or decrement)."""
+    ) -> None: ...
     @overload
     def __init__(
         self, start: __SupportsDecimalConversion,
