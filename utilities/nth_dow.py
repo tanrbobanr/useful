@@ -1,4 +1,4 @@
-def get_nth_dow(
+def nth_dow(
     year: int, month: int, dow: int, n: int
 ) -> datetime.date:
     """Get the Nth day of week for a given year and month. `n` starts
