@@ -1,4 +1,14 @@
-def get_abc_registry(abc_class: abc.ABCMeta) -> weakref.WeakSet:
+import abc
+import weakref
+from typing import (
+    Set,
+    Union,
+)
+
+
+def get_abc_registry(
+    abc_class: abc.ABCMeta
+) -> Union[weakref.WeakSet, Set[weakref.ReferenceType]]:
     """Get the ABC virtual subclass registry of the given ABC"""
     # if abc is using _py_abc, we can simply access _abc_registry
     registry: Union[weakref.WeakSet, None] = getattr(
