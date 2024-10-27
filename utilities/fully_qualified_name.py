@@ -34,4 +34,4 @@ def fqn(tp: type, show_builtin: bool = False):
     # builtins unless show_builtin=True
     if not show_builtin and (not mod or mod == "builtins"):
         return f"{tp.__qualname__}{append}"
-    return f"{mod.__name__}.{tp.__qualname__}{append}"
+    return f"{mod}.{tp.__qualname__}{append}"
